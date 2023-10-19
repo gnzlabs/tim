@@ -9,11 +9,11 @@ import (
 )
 
 type client struct {
-	host       connection.Details
+	host       *connection.Details
 	privateKey crypto.PrivateKey
 	handlers   map[string]command.Handler
 }
 
-func New(host connection.Details) (Client, error) {
+func New(host *connection.Details) (Client, error) {
 	return nil, errors.New("not yet implemented")
 }
