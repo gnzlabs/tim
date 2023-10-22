@@ -53,6 +53,7 @@ func (c *secureConnection) Decrypt(ciphertext string) (plaintext string, err err
 			if plaintextBytes, valid := box.OpenAfterPrecomputation(plaintextBytes, ciphertextBytes[:24], &nonce, c.sharedKey); !valid {
 				err = errors.New("decryption error: validation failed")
 			} else {
+				c.nonceHandler.Add(nonce)
 				plaintext = string(plaintextBytes)
 			}
 		}

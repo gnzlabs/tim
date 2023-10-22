@@ -12,6 +12,10 @@ func (n *nonceHandler) Contains(nonce *[24]byte) (exists bool) {
 	return
 }
 
+func (n *nonceHandler) Add(nonce [24]byte) {
+	n.usedNonces[nonce] = true
+}
+
 func (n *nonceHandler) GenerateNew() *[24]byte {
 	var nonce [24]byte
 	n.rng.Read(nonce[:])
@@ -19,6 +23,6 @@ func (n *nonceHandler) GenerateNew() *[24]byte {
 		var nonce [24]byte
 		n.rng.Read(nonce[:])
 	}
-	n.usedNonces[nonce] = true
+	n.Add(nonce)
 	return &nonce
 }
