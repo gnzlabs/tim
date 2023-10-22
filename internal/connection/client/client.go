@@ -15,5 +15,6 @@ type client struct {
 }
 
 func New(host *connection.Details) (Client, error) {
+
 	return nil, errors.New("not yet implemented")
 }
