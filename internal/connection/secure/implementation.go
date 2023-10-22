@@ -1,6 +1,11 @@
 package secure
 
-import "errors"
+import (
+	"encoding/base64"
+	"errors"
+
+	"golang.org/x/crypto/nacl/box"
+)
 
 // PublicKey implements SecureConnection.PublicKey for secureConnection
 func (c *secureConnection) PublicKey() (publicKey [32]byte) {
@@ -23,10 +28,34 @@ func (c *secureConnection) SetPeerKey(peerKey *[32]byte) (err error) {
 
 // Encrypt implements SecureConnection.Encrypt for secureConnection
 func (c *secureConnection) Encrypt(plaintext string) (ciphertext string, err error) {
-	return "", errors.New("not yet implemented")
+	plaintextBytes := []byte(plaintext)
+	nonce := c.nonceHandler.GenerateNew()
+	ciphertextBytes := make([]byte, len(plaintextBytes)+box.Overhead)
+	box.SealAfterPrecomputation(ciphertextBytes, plaintextBytes, nonce, c.sharedKey)
+	packedBytes := append(nonce[:], ciphertextBytes...)
+	ciphertext = base64.StdEncoding.EncodeToString(packedBytes)
+	return
 }
 
 // Decrypt implements SecureConnection.Decrypt for secureConnection
 func (c *secureConnection) Decrypt(ciphertext string) (plaintext string, err error) {
-	return "", errors.New("not yet implemented")
+	var nonce [24]byte
+	if ciphertextBytes, e := base64.StdEncoding.DecodeString(ciphertext); e != nil {
+		err = e
+	} else if len(ciphertextBytes) < 24+box.Overhead {
+		err = errors.New("decryption error: invalid length")
+	} else {
+		copy(nonce[:], ciphertextBytes[:24])
+		if c.nonceHandler.Contains(&nonce) {
+			err = errors.New("decryption error: nonce reuse")
+		} else {
+			plaintextBytes := make([]byte, len(ciphertextBytes[:24])-box.Overhead)
+			if plaintextBytes, valid := box.OpenAfterPrecomputation(plaintextBytes, ciphertextBytes[:24], &nonce, c.sharedKey); !valid {
+				err = errors.New("decryption error: validation failed")
+			} else {
+				plaintext = string(plaintextBytes)
+			}
+		}
+	}
+	return
 }

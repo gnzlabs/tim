@@ -19,5 +19,6 @@ func (n *nonceHandler) GenerateNew() *[24]byte {
 		var nonce [24]byte
 		n.rng.Read(nonce[:])
 	}
+	n.usedNonces[nonce] = true
 	return &nonce
 }
