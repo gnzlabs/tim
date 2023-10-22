@@ -1,8 +1,6 @@
 package configuration
 
 import (
-	"errors"
-
 	"github.com/gnzlabs/tim/internal/connection"
 )
 
@@ -12,5 +10,13 @@ type Configuration struct {
 }
 
 func New(binaryName, hostAddress string, port string, publicKey string) (config *Configuration, err error) {
-	return nil, errors.New("not yet implemented")
+	if connectionDetails, e := connection.ParseDetails(hostAddress, port, publicKey); e != nil {
+		err = e
+	} else {
+		config = &Configuration{
+			BinaryName: binaryName,
+			Host:       connectionDetails,
+		}
+	}
+	return
 }
