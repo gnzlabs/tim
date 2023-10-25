@@ -33,18 +33,18 @@ func (c *secureConnection) generateKey(rand io.Reader) (err error) {
 	return
 }
 
-func NewConnection(rand io.Reader) (connection *secureConnection, err error) {
-	connection = &secureConnection{
+func NewConnection(rand io.Reader) (connection Connection, err error) {
+	c := &secureConnection{
 		nonceHandler: &nonceHandler{
 			rng:        rand,
 			usedNonces: make(map[[24]byte]bool),
 		},
 	}
-	err = connection.generateKey(rand)
-	return connection, err
+	err = c.generateKey(rand)
+	return c, err
 }
 
-func EstablishedConnection(rand io.Reader, peerKey *[32]byte) (connection *secureConnection, err error) {
+func EstablishedConnection(rand io.Reader, peerKey *[32]byte) (connection Connection, err error) {
 	if connection, err = NewConnection(rand); err == nil {
 		err = connection.SetPeerKey(peerKey)
 	}

@@ -7,7 +7,7 @@ import (
 	"golang.org/x/crypto/nacl/box"
 )
 
-// PublicKey implements SecureConnection.PublicKey for secureConnection
+// PublicKey implements Connection.PublicKey for secureConnection
 func (c *secureConnection) PublicKey() (publicKey [32]byte) {
 	if c.publicKey != nil {
 		publicKey = *c.publicKey
@@ -15,7 +15,7 @@ func (c *secureConnection) PublicKey() (publicKey [32]byte) {
 	return
 }
 
-// SetPeerKey implements SecureConnection.SetPeerKey for secureConnection
+// SetPeerKey implements Connection.SetPeerKey for secureConnection
 func (c *secureConnection) SetPeerKey(peerKey *[32]byte) (err error) {
 	if c.peerPublicKey != nil {
 		err = errors.New("can't set peer key; key already exists")
@@ -26,7 +26,7 @@ func (c *secureConnection) SetPeerKey(peerKey *[32]byte) (err error) {
 	return
 }
 
-// Encrypt implements SecureConnection.Encrypt for secureConnection
+// Encrypt implements Connection.Encrypt for secureConnection
 func (c *secureConnection) Encrypt(plaintext string) (ciphertext string, err error) {
 	plaintextBytes := []byte(plaintext)
 	nonce := c.nonceHandler.GenerateNew()
@@ -37,7 +37,7 @@ func (c *secureConnection) Encrypt(plaintext string) (ciphertext string, err err
 	return
 }
 
-// Decrypt implements SecureConnection.Decrypt for secureConnection
+// Decrypt implements Connection.Decrypt for secureConnection
 func (c *secureConnection) Decrypt(ciphertext string) (plaintext string, err error) {
 	var nonce [24]byte
 	if ciphertextBytes, e := base64.StdEncoding.DecodeString(ciphertext); e != nil {
