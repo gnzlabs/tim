@@ -2,6 +2,7 @@ package client
 
 import (
 	"crypto/rand"
+	"net"
 
 	"github.com/gnzlabs/tim/internal/command"
 	"github.com/gnzlabs/tim/internal/connection"
@@ -9,6 +10,8 @@ import (
 )
 
 type SecureClient struct {
+	active         bool
+	connection     net.Conn
 	host           *connection.Details
 	messageHandler secure.Connection
 	handlers       map[string]command.Handler

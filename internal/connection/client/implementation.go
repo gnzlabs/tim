@@ -3,13 +3,17 @@ package client
 import (
 	"errors"
 	"fmt"
+	"net"
 
 	"github.com/gnzlabs/tim/internal/command"
 )
 
 // Connect implements Client.Connect for client
-func (c *SecureClient) Connect() error {
-	return errors.New("not yet implemented")
+func (c *SecureClient) Connect() (err error) {
+	if c.connection, err = net.Dial("tcp", c.host.ConnectionString()); err == nil {
+		c.active = true
+	}
+	return
 }
 
 // Disconnect implements Client.Disconnect for client

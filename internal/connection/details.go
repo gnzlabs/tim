@@ -25,6 +25,10 @@ func (d *Details) PublicBytes() (keyBytes *[32]byte, err error) {
 	return
 }
 
+func (d *Details) ConnectionString() (connectionDetails string) {
+	return fmt.Sprintf("%s:%d", d.Address, d.Port)
+}
+
 func ParseDetails(ipAddress, portNumber, publicKey string) (details Details, err error) {
 	if address := net.ParseIP(ipAddress); address == nil {
 		err = fmt.Errorf("invalid IP address: %s", ipAddress)
