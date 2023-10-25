@@ -1,20 +1,30 @@
 package client
 
 import (
-	"crypto"
-	"errors"
+	"crypto/rand"
 
 	"github.com/gnzlabs/tim/internal/command"
 	"github.com/gnzlabs/tim/internal/connection"
+	"github.com/gnzlabs/tim/internal/connection/secure"
 )
 
-type client struct {
-	host       *connection.Details
-	privateKey crypto.PrivateKey
-	handlers   map[string]command.Handler
+type SecureClient struct {
+	host           *connection.Details
+	messageHandler secure.Connection
+	handlers       map[string]command.Handler
 }
 
-func New(host *connection.Details) (Client, error) {
-
-	return nil, errors.New("not yet implemented")
+func New(host *connection.Details) (client Client, err error) {
+	if publicKey, e := host.PublicBytes(); e != nil {
+		err = e
+	} else if messageHandler, e := secure.EstablishedConnection(rand.Reader, publicKey); e != nil {
+		err = e
+	} else {
+		client = &SecureClient{
+			host:           host,
+			messageHandler: messageHandler,
+			handlers:       make(map[string]command.Handler),
+		}
+	}
+	return
 }
