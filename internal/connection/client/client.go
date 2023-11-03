@@ -2,6 +2,7 @@ package client
 
 import (
 	"crypto/rand"
+	"log/slog"
 	"net"
 
 	"github.com/gnzlabs/tim/internal/command"
@@ -12,9 +13,11 @@ import (
 type SecureClient struct {
 	active         bool
 	connection     net.Conn
-	host           *connection.Details
-	messageHandler secure.Connection
+	commandChannel chan command.Message
 	handlers       map[string]command.Handler
+	host           *connection.Details
+	log            *slog.Logger
+	messageHandler secure.Connection
 }
 
 func New(host *connection.Details) (client Client, err error) {

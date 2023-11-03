@@ -38,7 +38,7 @@ func (c *secureConnection) Encrypt(plaintext string) (ciphertext string, err err
 }
 
 // Decrypt implements Connection.Decrypt for secureConnection
-func (c *secureConnection) Decrypt(ciphertext string) (plaintext string, err error) {
+func (c *secureConnection) Decrypt(ciphertext string) (plaintext []byte, err error) {
 	var nonce [24]byte
 	if ciphertextBytes, e := base64.StdEncoding.DecodeString(ciphertext); e != nil {
 		err = e
@@ -53,8 +53,8 @@ func (c *secureConnection) Decrypt(ciphertext string) (plaintext string, err err
 			if plaintextBytes, valid := box.OpenAfterPrecomputation(plaintextBytes, ciphertextBytes[:24], &nonce, c.sharedKey); !valid {
 				err = errors.New("decryption error: validation failed")
 			} else {
+				plaintext = plaintextBytes
 				c.nonceHandler.Add(nonce)
-				plaintext = string(plaintextBytes)
 			}
 		}
 	}

@@ -10,8 +10,14 @@ import (
 
 // Connect implements Client.Connect for client
 func (c *SecureClient) Connect() (err error) {
+	connectionString := c.host.ConnectionString()
+	c.log.Info("Establishing connection", "host", connectionString)
 	if c.connection, err = net.Dial("tcp", c.host.ConnectionString()); err == nil {
 		c.active = true
+		c.log.Info("Connection successful", "host", connectionString)
+	} else {
+		c.connection = nil
+		c.log.Error("Connection failed", "host", connectionString, "error", err.Error())
 	}
 	return
 }
