@@ -8,9 +8,9 @@ import (
 )
 
 // PublicKey implements Connection.PublicKey for secureConnection
-func (c *secureConnection) PublicKey() (publicKey [32]byte) {
+func (c *secureConnection) PublicKey() (publicKey *[32]byte) {
 	if c.publicKey != nil {
-		publicKey = *c.publicKey
+		publicKey = c.publicKey
 	}
 	return
 }
@@ -22,6 +22,14 @@ func (c *secureConnection) SetPeerKey(peerKey *[32]byte) (err error) {
 	} else {
 		c.peerPublicKey = peerKey
 		err = c.establishConnection()
+	}
+	return
+}
+
+// SharedKey implements Connection.SharedKey for secureConnection
+func (c *secureConnection) SharedKey() (sharedKey *[32]byte) {
+	if c.sharedKey != nil {
+		sharedKey = c.sharedKey
 	}
 	return
 }

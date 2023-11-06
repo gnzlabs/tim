@@ -12,14 +12,16 @@ type secureConnection struct {
 	publicKey     *[32]byte
 	peerPublicKey *[32]byte
 	sharedKey     *[32]byte
-	nonceHandler  *nonceHandler
+	nonceHandler  *NonceHandler
 }
 
 func (c *secureConnection) establishConnection() (err error) {
 	if c.peerPublicKey == nil {
 		err = errors.New("can't establish connection; peer key not set")
 	} else {
-		box.Precompute(c.sharedKey, c.peerPublicKey, c.privateKey)
+		var sharedKey [32]byte
+		box.Precompute(&sharedKey, c.peerPublicKey, c.privateKey)
+		c.sharedKey = &sharedKey
 	}
 	return
 }
@@ -35,9 +37,9 @@ func (c *secureConnection) generateKey(rand io.Reader) (err error) {
 
 func NewConnection(rand io.Reader) (connection Connection, err error) {
 	c := &secureConnection{
-		nonceHandler: &nonceHandler{
-			rng:        rand,
-			usedNonces: make(map[[24]byte]bool),
+		nonceHandler: &NonceHandler{
+			Rng:        rand,
+			UsedNonces: make(map[[24]byte]bool),
 		},
 	}
 	err = c.generateKey(rand)
